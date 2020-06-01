@@ -179,3 +179,6 @@ function Import-MyFunction
 
 # Setup alias
 Set-Alias -Name Watch -Value Watch-Command -Force
+
+# PSReadline binding
+Set-PSReadLineKeyHandler -Key "Ctrl+f" -Function ForwardWord
