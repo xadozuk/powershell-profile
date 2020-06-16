@@ -1,6 +1,4 @@
-$PSDefaultParameterValues = @{
-    "Install-Module:Scope" = "CurrentUser"
-}
+#region Helpers functions
 
 function Reset-Profile
 {
@@ -116,9 +114,166 @@ function ConvertTo-HumanInterval
     }
 }
 
-function Prompt
+function Import-MyFunction
 {
-    if(-not $?)
+    if($null -ne $env:PSMYHOME -and (Test-Path -Path $env:PSMYHOME -PathType Container))
+    {
+        $Files = Get-ChildItem -Path $env:PSMYHOME -Filter "*.ps1" -Recurse -File
+
+        $Files | ForEach-Object { . $_.FullName }
+    }
+    else
+    {
+        Write-Host -ForegroundColor Cyan "You can customize the auto-load folder by setting `$env:PSMYHOME"
+    }
+}
+
+function Get-ShortPath
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position=0)]
+        [string] $Path
+    )
+
+    if($Path -like "$HOME*")
+    {
+        "~" + $Path.Replace($HOME, '')
+    }
+    else
+    {
+        $Path
+    }
+}
+
+function Test-InWindowsTerminal
+{
+    return $null -ne $env:WT_SESSION
+}
+
+#endregion
+
+#region Custom prompt
+
+$MyTheme = @{
+    Symbols = @{
+        PromptIndicator = '❯'
+        FailedCommand   = '⨯'
+        Separator       =  [Text.Encoding]::UTF8.GetString(@(0xee, 0x82, 0xb0))
+    }
+    
+    Colors = @{
+        DefaultFG = "White"
+        DefaultBG = "Black"
+        CurrentPathFG  = "DarkGray"
+        CurrentPathBG  = "Black"
+        CommandTimeFG  = "White"
+        CommandTimeBG  = "DarkGreen"
+        FailedCommandFG = "White"
+        FailedCommandBG = "Red"
+        GitStatusFG     = "White"
+        GitStatusBG     = "DarkBlue"
+    }
+
+    Options = @{
+        Padding = 1
+    }
+}
+
+function Write-Prompt
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0)]
+        [object] $Object = "",
+
+        [Parameter()]
+        [string] $ForegroundColor = "White",
+
+        [Parameter()]
+        [string] $BackgroundColor = "Black",
+
+        [Parameter()]
+        [switch] $NewLine,
+
+        [Parameter()]
+        [switch] $Separator
+    )
+
+    if($NewLine) { Write-Host "" }
+
+    $Object = if($Separator)
+    { 
+        $MyTheme.Symbols.Separator
+    }
+    else
+    { 
+        $Format = if($NewLine) { "{1}{0}" } else { "{0}{1}{0}" }
+        $Format -f (" " * $MyTheme.Options.Padding), $Object
+    }
+
+    Write-Host `
+        -Object $Object `
+        -ForegroundColor $ForegroundColor `
+        -BackgroundColor $BackgroundColor `
+        -NoNewline
+}
+
+function Write-PowerlinePrompt
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [bool] $FailedCommand
+    )
+
+    $s = $MyTheme.Symbols
+    $c = $MyTheme.Colors
+
+    if($FailedCommand)
+    {
+        Write-Prompt -Object $s.FailedCommand -ForegroundColor $c.FailedCommandFG -BackgroundColor $c.FailedCommandBG
+        Write-Prompt -Separator -BackgroundColor $c.CommandTimeBG -ForegroundColor $c.FailedCommandBG
+    }
+
+    $Host.UI.RawUI.WindowTitle = "PowerShell"
+
+    # Last command run time
+    $LastCommandTime = Get-CommandExecutionTime -Last
+    
+    if($LastCommandTime)
+    {
+        Write-Prompt (ConvertTo-HumanInterval -Interval $LastCommandTime) -ForegroundColor $c.CommandTimeFG -BackgroundColor $c.CommandTimeBG
+        Write-Prompt -Separator -ForegroundColor $c.CommandTimeBG -BackgroundColor $c.CurrentPathBG
+    }
+
+    # Current path
+    $CurrentPath = $ExecutionContext.SessionState.Path.CurrentLocation.ProviderPath
+
+    $ShortPath = Get-ShortPath -Path $CurrentPath
+    Write-Prompt $ShortPath -ForegroundColor $c.CurrentPathFG -BackgroundColor $c.CurrentPathBG
+
+    # Git
+    if(Test-GitRepository -Path $CurrentPath)
+    {
+        Write-Prompt -Separator -ForegroundColor $c.CurrentPathBG -BackgroundColor $c.GitStatusBG
+        Write-Prompt (Get-GitStatus).Branch -ForegroundColor $c.GitStatusFG -BackgroundColor $c.GitStatusBG
+        Write-Prompt -Separator -ForegroundColor $c.GitStatusBG -BackgroundColor $c.DefaultBG
+    }
+
+    Write-Host "`n$($s.PromptIndicator * ($nestedPromptLevel + 1))" -NoNewLine
+    return " "
+}
+
+function Write-ClassicPrompt
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [bool] $FailedCommand
+    )
+
+    if($FailedCommand)
     {
         Write-Host -ForegroundColor Red "! " -NoNewline
     }
@@ -138,15 +293,8 @@ function Prompt
     # Current path
     $CurrentPath = $ExecutionContext.SessionState.Path.CurrentLocation.ProviderPath
 
-    <#
-    if($CurrentPath -like "$HOME*")
-    {
-        Write-Host '~' -NoNewline -ForegroundColor Yellow
-        $CurrentPath = $CurrentPath.Replace("$HOME", '')
-    }
-    #>
-
-    Write-Host $CurrentPath -NoNewline -ForegroundColor DarkGray
+    $ShortPath = Get-ShortPath -Path $CurrentPath
+    Write-Host $ShortPath -NoNewline -ForegroundColor DarkGray
 
     # Git
     if(Test-GitRepository -Path $CurrentPath)
@@ -160,18 +308,25 @@ function Prompt
     return " "
 }
 
-function Import-MyFunction
+function Prompt
 {
-    if($null -ne $env:PSMYHOME -and (Test-Path -Path $env:PSMYHOME -PathType Container))
-    {
-        $Files = Get-ChildItem -Path $env:PSMYHOME -Filter "*.ps1" -Recurse -File
+    $FailedCommand = -not $?
 
-        $Files | ForEach-Object { . $_.FullName }
+    # if in Windows Terminal
+    if(Test-InWindowsTerminal)
+    {
+        Write-PowerlinePrompt -FailedCommand $FailedCommand
     }
     else
     {
-        Write-Host -ForegroundColor Cyan "You can customize the auto-load folder by setting `$env:PSMYHOME"
+        Write-ClassicPrompt -FailedCommand $FailedCommand
     }
+}
+
+#endregion
+
+$PSDefaultParameterValues = @{
+    "Install-Module:Scope" = "CurrentUser"
 }
 
 # Auto load my functions
@@ -182,3 +337,6 @@ Set-Alias -Name Watch -Value Watch-Command -Force
 
 # PSReadline binding
 Set-PSReadLineKeyHandler -Key "Ctrl+f" -Function ForwardWord
+
+if(Test-InWindowsTerminal) { Set-PSReadLineOption -PromptText "❯ " }
+else { Set-PSReadLineOption -PromptText "> " }
