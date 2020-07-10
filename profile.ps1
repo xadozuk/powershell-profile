@@ -146,9 +146,9 @@ function Get-ShortPath
     }
 }
 
-function Test-InWindowsTerminal
+function Test-Powerline
 {
-    return $null -ne $env:WT_SESSION
+    return ($null -ne $env:WT_SESSION) -and ($env:TERM_PROGRAM -ne "vscode")
 }
 
 #endregion
@@ -313,7 +313,7 @@ function Prompt
     $FailedCommand = -not $?
 
     # if in Windows Terminal
-    if(Test-InWindowsTerminal)
+    if(Test-Powerline)
     {
         Write-PowerlinePrompt -FailedCommand $FailedCommand
     }
@@ -335,8 +335,11 @@ $PSDefaultParameterValues = @{
 # Setup alias
 Set-Alias -Name Watch -Value Watch-Command -Force
 
+# PSReadline options
+Set-PSReadLineOption -PredictionSource History
+
 # PSReadline binding
 Set-PSReadLineKeyHandler -Key "Ctrl+f" -Function ForwardWord
 
-if(Test-InWindowsTerminal) { Set-PSReadLineOption -PromptText "❯ " }
+if(Test-Powerline) { Set-PSReadLineOption -PromptText "❯ " }
 else { Set-PSReadLineOption -PromptText "> " }
