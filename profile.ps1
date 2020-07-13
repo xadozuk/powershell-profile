@@ -335,8 +335,11 @@ $PSDefaultParameterValues = @{
 # Setup alias
 Set-Alias -Name Watch -Value Watch-Command -Force
 
-# PSReadline options
-Set-PSReadLineOption -PredictionSource History
+if((Get-Module -Name PSReadLine).Version -ge [Version]"2.1.0")
+{
+    # PSReadline options
+    Set-PSReadLineOption -PredictionSource History   
+}
 
 # PSReadline binding
 Set-PSReadLineKeyHandler -Key "Ctrl+f" -Function ForwardWord
