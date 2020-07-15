@@ -84,8 +84,8 @@ function Get-CommandExecutionTime
 
         $Command = (Get-History)[-1]
     }
-
-    return $Command.Duration
+    
+    return $Command.EndExecutionTime - $Command.StartExecutionTime
 }
 
 function ConvertTo-HumanInterval
