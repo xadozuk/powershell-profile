@@ -326,7 +326,11 @@ function Prompt
 #endregion
 
 $PSDefaultParameterValues = @{
-    "Install-Module:Scope" = "CurrentUser"
+    # Install module in user scope by default (no need for admin prompt)
+    "Install-Module:Scope"      = "CurrentUser"
+
+    # Capture last command in the $__ var
+    "Out-Default:OutVariable"   = "__"
 }
 
 # Auto load my functions
