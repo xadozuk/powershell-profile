@@ -146,6 +146,21 @@ function Get-ShortPath
     }
 }
 
+function Get-CurrentAzContext
+{
+    if(-not (Test-Path -Path "~\.azure\AzureRmContext.json")) { return $null }
+
+    $Az = Get-Content -Path "~\.azure\AzureRmContext.json" | ConvertFrom-Json 
+    return $Az.Contexts.($Az.DefaultContextKey)
+}
+
+function Get-CurrentKubernetesContext
+{
+    if($null -eq (Get-Command -Name kubectl)) { return $null }
+
+    return &"kubectl" config current-context
+}
+
 function Test-Powerline
 {
     return ($null -ne $env:WT_SESSION) -and ($env:TERM_PROGRAM -ne "vscode")
@@ -159,7 +174,11 @@ $MyTheme = @{
     Symbols = @{
         PromptIndicator = '❯'
         FailedCommand   = '⨯'
-        Separator       =  [Text.Encoding]::UTF8.GetString(@(0xee, 0x82, 0xb0))
+        Separator       = [Text.Encoding]::UTF8.GetString(@(0xee, 0x82, 0xb0))
+        Azure           = [char]::ConvertFromUtf32(0xfd03)
+        Docker          = [char]::ConvertFromUtf32(0xf308)
+        Folder          = [char]::ConvertFromUtf32(0xf07b)
+        GitBranch       = [char]::ConvertFromUtf32(0xe725)
     }
     
     Colors = @{
@@ -171,8 +190,12 @@ $MyTheme = @{
         CommandTimeBG  = "DarkGreen"
         FailedCommandFG = "White"
         FailedCommandBG = "Red"
-        GitStatusFG     = "White"
-        GitStatusBG     = "DarkBlue"
+        GitStatusFG     = "Black"
+        GitStatusBG     = "Cyan"
+        AzContextFG     = "White"
+        AzContextBG     = "DarkBlue"
+        K8sContextFG    = "White"
+        K8sContextBG    = "DarkYellow"
     }
 
     Options = @{
@@ -219,6 +242,32 @@ function Write-Prompt
         -NoNewline
 }
 
+function _Write-PowerlinePrompt
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [object[]] $Segments
+    )
+
+    for($i = 0; $i -lt $Segments.Count; $i++)
+    {
+        $NextBGColor = if($i + 1 -eq $Segments.Count -or $Segments[$i + 1].NewLine) { $MyTheme.Colors.DefaultBG }
+                       else { $Segments[$i + 1].BackgroundColor }
+
+        Write-Prompt -Object $Segments[$i].Object -ForegroundColor $Segments[$i].ForegroundColor -BackgroundColor $Segments[$i].BackgroundColor -NewLine:$Segments[$i].NewLine
+
+        if(-not $Segments[$i].NoSeparator)
+        {
+            Write-Prompt -Separator -BackgroundColor $NextBGColor -ForegroundColor $Segments[$i].BackgroundColor
+        }
+    }
+
+    Write-Host "`n$($s.PromptIndicator * ($nestedPromptLevel + 1))" -NoNewLine
+    return " "
+}
+
 function Write-PowerlinePrompt
 {
     [CmdletBinding()]
@@ -227,42 +276,83 @@ function Write-PowerlinePrompt
         [bool] $FailedCommand
     )
 
+    $Host.UI.RawUI.WindowTitle = "PowerShell"
+    $CurrentPath = $ExecutionContext.SessionState.Path.CurrentLocation.ProviderPath
+
+    $Segments = [System.Collections.ArrayList]::new()
+
     $s = $MyTheme.Symbols
     $c = $MyTheme.Colors
 
     if($FailedCommand)
     {
-        Write-Prompt -Object $s.FailedCommand -ForegroundColor $c.FailedCommandFG -BackgroundColor $c.FailedCommandBG
-        Write-Prompt -Separator -BackgroundColor $c.CommandTimeBG -ForegroundColor $c.FailedCommandBG
-    }
+        [void] $Segments.Add(@{
+            Object          = $s.FailedCommand
+            ForegroundColor = $c.FailedCommandFG
+            BackgroundColor = $c.FailedCommandBG
+        })
 
-    $Host.UI.RawUI.WindowTitle = "PowerShell"
+        #Write-Prompt -Object $s.FailedCommand -ForegroundColor $c.FailedCommandFG -BackgroundColor $c.FailedCommandBG
+        #Write-Prompt -Separator -BackgroundColor $c.CommandTimeBG -ForegroundColor $c.FailedCommandBG
+    }    
 
     # Last command run time
     $LastCommandTime = Get-CommandExecutionTime -Last
-    
     if($LastCommandTime)
     {
-        Write-Prompt (ConvertTo-HumanInterval -Interval $LastCommandTime) -ForegroundColor $c.CommandTimeFG -BackgroundColor $c.CommandTimeBG
-        Write-Prompt -Separator -ForegroundColor $c.CommandTimeBG -BackgroundColor $c.CurrentPathBG
+        [void] $Segments.Add(@{
+            Object = (ConvertTo-HumanInterval -Interval $LastCommandTime)
+            ForegroundColor = $c.CommandTimeFG
+            BackgroundColor = $c.CommandTimeBG
+        })
     }
 
-    # Current path
-    $CurrentPath = $ExecutionContext.SessionState.Path.CurrentLocation.ProviderPath
+    # Azure subscription
+    $CurrentAzContext = Get-CurrentAzContext
+    if($CurrentAzContext)
+    {
+        #Write-Prompt $CurrentAzContext.Subscription.Name -ForegroundColor $c.AzContextFG -BackgroundColor $c.CommandTimeBG
+        #Write-Prompt -Separator -ForegroundColor $c.CommandTimeBG -BackgroundColor $c.CurrentPathBG
+        [void] $Segments.Add(@{
+            Object = $s.Azure + " " + $CurrentAzContext.Subscription.Name
+            ForegroundColor = $c.AzContextFG
+            BackgroundColor = $c.AzContextBG
+        })
+    }
 
-    $ShortPath = Get-ShortPath -Path $CurrentPath
-    Write-Prompt $ShortPath -ForegroundColor $c.CurrentPathFG -BackgroundColor $c.CurrentPathBG
+    # K8s context
+    $CurrentK8sContext = Get-CurrentKubernetesContext
+    if($CurrentK8sContext)
+    {
+        [void] $Segments.Add(@{
+            Object = $s.Docker + " " + $CurrentK8sContext
+            ForegroundColor = $c.K8sContextFG
+            BackgroundColor = $c.K8sContextBG
+        })
+    }
 
     # Git
     if(Test-GitRepository -Path $CurrentPath)
     {
-        Write-Prompt -Separator -ForegroundColor $c.CurrentPathBG -BackgroundColor $c.GitStatusBG
-        Write-Prompt (Get-GitStatus).Branch -ForegroundColor $c.GitStatusFG -BackgroundColor $c.GitStatusBG
-        Write-Prompt -Separator -ForegroundColor $c.GitStatusBG -BackgroundColor $c.DefaultBG
+        [void] $Segments.Add(@{
+            Object = $s.GitBranch + " "+ (Get-GitStatus).Branch
+            ForegroundColor = $c.GitStatusFG
+            BackgroundColor = $c.GitStatusBG
+        })
     }
 
-    Write-Host "`n$($s.PromptIndicator * ($nestedPromptLevel + 1))" -NoNewLine
-    return " "
+    # Current path
+    $ShortPath = Get-ShortPath -Path $CurrentPath
+    
+    [void] $Segments.Add(@{
+        Object = $s.Folder + " " + $ShortPath
+        ForegroundColor = $c.CurrentPathFG
+        BackgroundColor = $c.CurrentPathBG
+        NewLine         = $true
+        NoSeparator     = $true
+    })
+
+    return _Write-PowerlinePrompt -Segments $Segments
 }
 
 function Write-ClassicPrompt
