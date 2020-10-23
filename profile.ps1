@@ -172,6 +172,7 @@ function Test-Powerline
 
 $MyTheme = @{
     Symbols = @{
+        # Using font CaskaydiaCove (Nerd Font patched)
         PromptIndicator = '❯'
         FailedCommand   = '⨯'
         Separator       = [Text.Encoding]::UTF8.GetString(@(0xee, 0x82, 0xb0))
