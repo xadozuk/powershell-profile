@@ -58,13 +58,6 @@ function Get-GitStatus
     [PSCustomObject] $Object
 }
 
-function Write-GitStatus
-{
-    $Status = Get-GitStatus
-
-    Write-Host $Status.Branch -NoNewline -ForegroundColor "Blue"
-}
-
 function Get-CommandExecutionTime
 {
     [CmdletBinding()]
@@ -163,12 +156,19 @@ function Get-CurrentKubernetesContext
 
 function Test-Powerline
 {
-    return ($null -ne $env:WT_SESSION) -and ($env:TERM_PROGRAM -ne "vscode")
+    return ($null -ne $env:WT_SESSION) -and ($env:TERM_PROGRAM -ne "vscode") -and -not $MySettings.DisablePowerlinePrompt
 }
 
 #endregion
 
 #region Custom prompt
+
+if($null -eq $MySettings)
+{
+    $MySettings = @{
+        DisablePowerlinePrompt = $false
+    }
+}
 
 $MyTheme = @{
     Symbols = @{
@@ -356,6 +356,30 @@ function Write-PowerlinePrompt
     return _Write-PowerlinePrompt -Segments $Segments
 }
 
+function _Write-ClassicPrompt
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [object[]] $Segments
+    )
+
+    for($i = 0; $i -lt $Segments.Count; $i++)
+    {
+        $Object = $Segments[$i].Object
+
+        if(-not $Segments[$i].NoSeparator) { $Object = "[$Object]" }
+
+        if($Segments[$i].NewLine) { Write-Host "" }
+
+        Write-Host -Object $Object -ForegroundColor $Segments[$i].ForegroundColor -NoNewLine
+    }
+
+    Write-Host "`n$('>' * ($nestedPromptLevel + 1))" -NoNewLine
+    return " "
+}
+
 function Write-ClassicPrompt
 {
     [CmdletBinding()]
@@ -364,39 +388,73 @@ function Write-ClassicPrompt
         [bool] $FailedCommand
     )
 
+    $Host.UI.RawUI.WindowTitle = "PowerShell"
+    $CurrentPath = $ExecutionContext.SessionState.Path.CurrentLocation.ProviderPath
+
+    $Segments = [System.Collections.ArrayList]::new()
+
     if($FailedCommand)
     {
-        Write-Host -ForegroundColor Red "! " -NoNewline
+        [void] $Segments.Add(@{
+            Object = 'x'
+            ForegroundColor = "Red"   
+        })
     }
-
-    $Host.UI.RawUI.WindowTitle = "PowerShell"   
 
     # Last command run time
     $LastCommandTime = Get-CommandExecutionTime -Last
     
     if($LastCommandTime)
     {
-        Write-Host "[" -NoNewline
-        Write-Host -NoNewline -ForegroundColor "Green" (ConvertTo-HumanInterval -Interval $LastCommandTime)
-        Write-Host "] " -NoNewline
+        [void] $Segments.Add(@{
+            Object = (ConvertTo-HumanInterval -Interval $LastCommandTime)
+            ForegroundColor = "Green"
+        })
     }
 
-    # Current path
-    $CurrentPath = $ExecutionContext.SessionState.Path.CurrentLocation.ProviderPath
+    # TODO: build a DSL to define segments and have a functions for each case (text or powerline)
 
-    $ShortPath = Get-ShortPath -Path $CurrentPath
-    Write-Host $ShortPath -NoNewline -ForegroundColor DarkGray
+    # Azure subscription
+    $CurrentAzContext = Get-CurrentAzContext
+    if($CurrentAzContext)
+    {
+        #Write-Prompt $CurrentAzContext.Subscription.Name -ForegroundColor $c.AzContextFG -BackgroundColor $c.CommandTimeBG
+        #Write-Prompt -Separator -ForegroundColor $c.CommandTimeBG -BackgroundColor $c.CurrentPathBG
+        [void] $Segments.Add(@{
+            Object = $CurrentAzContext.Subscription.Name
+            ForegroundColor = "Blue"
+        })
+    }
+
+    # K8s context
+    $CurrentK8sContext = Get-CurrentKubernetesContext
+    if($CurrentK8sContext)
+    {
+        [void] $Segments.Add(@{
+            Object = $CurrentK8sContext
+            ForegroundColor =  "Yellow"
+        })
+    }
 
     # Git
     if(Test-GitRepository -Path $CurrentPath)
     {
-        Write-Host " [" -NoNewline
-        Write-GitStatus
-        Write-Host "]" -NoNewline
+        [void] $Segments.Add(@{
+            Object = (Get-GitStatus).Branch
+            ForegroundColor = "Cyan"
+        })
     }
 
-    Write-Host "`n$('>' * ($nestedPromptLevel + 1))" -NoNewline
-    return " "
+    # Current path
+    $ShortPath = Get-ShortPath -Path $CurrentPath
+    [void] $Segments.Add(@{
+        Object = $ShortPath
+        ForegroundColor = "DarkGray"
+        NewLine = $true
+        NoSeparator = $true
+    })
+
+    return _Write-ClassicPrompt -Segments $Segments
 }
 
 function Prompt
