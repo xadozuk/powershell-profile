@@ -1,0 +1,106 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "executiontime",
+          "style": "plain",
+          "foreground": "green",
+          "properties": {
+            "always_enabled": true,
+            "style": "round",
+            "prefix": "[",
+            "postfix": "]"
+          }
+        },
+        {
+          "type": "az",
+          "style": "plain",
+          "foreground": "blue",
+          "properties": {
+            "template": "{{ .Name }}",
+            "prefix": "[",
+            "postfix": "]"
+          }
+        },
+        {
+          "type": "kubectl",
+          "style": "plain",
+          "foreground": "#c19c00",
+          "properties": {
+            "prefix": "[",
+            "postfix": "]"
+          }
+        },
+        {
+          "type": "git",
+          "style": "plain",
+          "foreground": "lightCyan",
+          "properties": {
+            "fetch_status": true,
+            "fetch_stash_count": false,
+            "fetch_upstream_icon": false,
+            "branch_max_length": 25,
+            "branch_icon": "",
+            "template": "{{ .HEAD }}{{ .BranchStatus }}",
+            "prefix": "[",
+            "postfix": "]"
+          }
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "type": "path",
+          "style": "plain",
+          "foreground": "darkGray",
+          "background": "transparent",
+          "properties": {
+            "home_icon": "~",
+            "style": "full",
+            "prefix": "",
+            "postfix": ""
+          }
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "type": "exit",
+          "style": "diamond",
+          "foreground": "#eeeeee",
+          "foreground_templates": ["{{ if gt .Code 0 }}red{{ end }}"],
+          "leading_diamond": "",
+          "trailing_diamond": "",
+          "properties": {
+            "always_enabled": false,
+            "template": "x",
+            "prefix": ""
+          }
+        },
+        {
+          "type": "text",
+          "style": "plain",
+          "foreground": "#eeeeee",
+          "properties": {
+            "prefix": "",
+            "postfix": "",
+            "template": ">"
+          }
+        }
+      ]
+    }
+  ],
+  "final_space": true
+}

@@ -1,0 +1,109 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "executiontime",
+          "style": "diamond",
+          "foreground": "#eeeeee",
+          "background": "green",
+          "leading_diamond": "",
+          "trailing_diamond": "",
+          "properties": {
+            "always_enabled": true,
+            "style": "round"
+          }
+        },
+        {
+          "type": "az",
+          "style": "powerline",
+          "background": "blue",
+          "foreground": "#eeeeee",
+          "powerline_symbol": "\uE0B0",
+          "properties": {
+            "prefix": " \uFD03 ",
+            "template": "{{ .Name }}"
+          }
+        },
+        {
+          "type": "kubectl",
+          "style": "powerline",
+          "powerline_symbol": "\uE0B0",
+          "foreground": "#eeeeee",
+          "background": "#c19c00",
+          "properties": {
+            "prefix": " \uF308 "
+          }
+        },
+        {
+          "type": "git",
+          "style": "powerline",
+          "powerline_symbol": "\uE0B0",
+          "foreground": "black",
+          "background": "lightCyan",
+          "properties": {
+            "fetch_status": true,
+            "fetch_stash_count": true,
+            "fetch_upstream_icon": true,
+            "branch_max_length": 25,
+            "branch_icon": "\uE725 ",
+            "template": "{{ .HEAD }}{{ .BranchStatus }} {{ .UpstreamIcon }}",
+            "postfix": ""
+          }
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "type": "path",
+          "style": "plain",
+          "foreground": "darkGray",
+          "background": "transparent",
+          "properties": {
+            "prefix": "\uF07B ",
+            "home_icon": "~",
+            "style": "full"
+          }
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "type": "exit",
+          "style": "diamond",
+          "foreground": "#eeeeee",
+          "foreground_templates": ["{{ if gt .Code 0 }}red{{ end }}"],
+          "leading_diamond": "",
+          "trailing_diamond": "",
+          "properties": {
+            "always_enabled": false,
+            "template": "\uF7D3",
+            "prefix": ""
+          }
+        },
+        {
+          "type": "text",
+          "style": "plain",
+          "foreground": "#eeeeee",
+          "properties": {
+            "prefix": "",
+            "postfix": "",
+            "template": "\u276F"
+          }
+        }
+      ]
+    }
+  ],
+  "final_space": true
+}
