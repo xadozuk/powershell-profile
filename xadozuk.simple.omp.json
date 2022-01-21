@@ -45,7 +45,7 @@
             "fetch_upstream_icon": false,
             "branch_max_length": 25,
             "branch_icon": "",
-            "template": "{{ .HEAD }}{{ .BranchStatus }}",
+            "template": "{{ .HEAD }}",
             "prefix": "[",
             "postfix": "]"
           }
