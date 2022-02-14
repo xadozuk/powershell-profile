@@ -2,105 +2,96 @@
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
   "blocks": [
     {
-      "type": "prompt",
       "alignment": "left",
       "segments": [
         {
-          "type": "executiontime",
-          "style": "plain",
           "foreground": "green",
           "properties": {
             "always_enabled": true,
             "style": "round",
-            "prefix": "[",
-            "postfix": "]"
-          }
+            "template": "[{{ .FormattedMs }}]"
+          },
+          "style": "plain",
+          "type": "executiontime"
         },
         {
-          "type": "az",
-          "style": "plain",
           "foreground": "blue",
           "properties": {
-            "template": "{{ .Name }}",
-            "prefix": "[",
-            "postfix": "]"
-          }
+            "template": "[{{ .Name }}]"
+          },
+          "style": "plain",
+          "type": "az"
         },
         {
-          "type": "kubectl",
-          "style": "plain",
           "foreground": "#c19c00",
           "properties": {
-            "prefix": "[",
-            "postfix": "]"
-          }
+            "template": "[{{ .Context }}{{ if .Namespace }} :: {{ .Namespace }}{{ end }}]"
+          },
+          "style": "plain",
+          "type": "kubectl"
         },
         {
-          "type": "git",
-          "style": "plain",
           "foreground": "lightCyan",
           "properties": {
-            "fetch_status": true,
-            "fetch_stash_count": false,
-            "fetch_upstream_icon": false,
-            "branch_max_length": 25,
             "branch_icon": "",
-            "template": "{{ .HEAD }}",
-            "prefix": "[",
-            "postfix": "]"
-          }
+            "branch_max_length": 25,
+            "fetch_stash_count": false,
+            "fetch_status": true,
+            "fetch_upstream_icon": false,
+            "template": "[{{ .HEAD }}]"
+          },
+          "style": "plain",
+          "type": "git"
         }
-      ]
+      ],
+      "type": "prompt"
     },
     {
-      "type": "prompt",
       "alignment": "left",
       "newline": true,
       "segments": [
         {
-          "type": "path",
-          "style": "plain",
-          "foreground": "darkGray",
           "background": "transparent",
+          "foreground": "darkGray",
           "properties": {
             "home_icon": "~",
             "style": "full",
-            "prefix": "",
-            "postfix": ""
-          }
+            "template": "{{ .Path }}"
+          },
+          "style": "plain",
+          "type": "path"
         }
-      ]
+      ],
+      "type": "prompt"
     },
     {
-      "type": "prompt",
       "alignment": "left",
       "newline": true,
       "segments": [
         {
-          "type": "exit",
-          "style": "diamond",
           "foreground": "#eeeeee",
-          "foreground_templates": ["{{ if gt .Code 0 }}red{{ end }}"],
-          "leading_diamond": "",
-          "trailing_diamond": "",
+          "foreground_templates": [
+            "{{ if gt .Code 0 }}red{{ end }}"
+          ],
           "properties": {
             "always_enabled": false,
-            "template": "x",
-            "prefix": ""
-          }
+            "template": "x "
+          },
+          "style": "diamond",
+          "type": "exit"
         },
         {
-          "type": "text",
-          "style": "plain",
           "foreground": "#eeeeee",
           "properties": {
-            "prefix": "",
-            "postfix": "",
             "template": ">"
-          }
+          },
+          "style": "plain",
+          "type": "text"
         }
-      ]
+      ],
+      "type": "prompt"
     }
   ],
-  "final_space": true
+  "final_space": true,
+  "version": 1
 }
