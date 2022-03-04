@@ -34,7 +34,7 @@
           "foreground": "lightCyan",
           "properties": {
             "branch_icon": "",
-            "branch_max_length": 25,
+            "branch_max_length": 0,
             "fetch_stash_count": false,
             "fetch_status": true,
             "fetch_upstream_icon": false,
