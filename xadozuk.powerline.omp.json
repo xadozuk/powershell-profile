@@ -30,7 +30,8 @@
           "foreground": "#eeeeee",
           "powerline_symbol": "\ue0b0",
           "properties": {
-            "template": " \uf308 {{ .Context }}{{ if .Namespace }} :: {{ .Namespace }}{{ end }} "
+            "template": " \uf308 {{ .Context }}{{ if .Namespace }} :: {{ .Namespace }}{{ end }} ",
+            "parse_kubeconfig": true
           },
           "style": "powerline",
           "type": "kubectl"
@@ -43,9 +44,9 @@
             "branch_icon": "\ue725 ",
             "branch_max_length": 0,
             "fetch_stash_count": false,
-            "fetch_status": true,
-            "fetch_upstream_icon": true,
-            "template": " {{ .HEAD }}{{ .BranchStatus }} {{ .UpstreamIcon }}"
+            "fetch_status": false,
+            "fetch_upstream_icon": false,
+            "template": " {{ .HEAD }} "
           },
           "style": "powerline",
           "type": "git"

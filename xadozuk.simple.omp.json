@@ -25,7 +25,8 @@
         {
           "foreground": "#c19c00",
           "properties": {
-            "template": "[{{ .Context }}{{ if .Namespace }} :: {{ .Namespace }}{{ end }}]"
+            "template": "[{{ .Context }}{{ if .Namespace }} :: {{ .Namespace }}{{ end }}]",
+            "parse_kubeconfig": true
           },
           "style": "plain",
           "type": "kubectl"
@@ -36,7 +37,7 @@
             "branch_icon": "",
             "branch_max_length": 0,
             "fetch_stash_count": false,
-            "fetch_status": true,
+            "fetch_status": false,
             "fetch_upstream_icon": false,
             "template": "[{{ .HEAD }}]"
           },
