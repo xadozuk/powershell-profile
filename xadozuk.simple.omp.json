@@ -8,27 +8,28 @@
           "foreground": "green",
           "properties": {
             "always_enabled": true,
-            "style": "round",
-            "template": "[{{ .FormattedMs }}]"
+            "style": "round"
           },
           "style": "plain",
+          "template": "[{{ .FormattedMs }}]",
           "type": "executiontime"
         },
         {
           "foreground": "blue",
-          "properties": {
-            "template": "[{{ .Name }}]"
-          },
           "style": "plain",
+          "template": "[{{ .Name }}]",
+          "properties": {
+            "source": "pwsh"
+          },
           "type": "az"
         },
         {
           "foreground": "#c19c00",
           "properties": {
-            "template": "[{{ .Context }}{{ if .Namespace }} :: {{ .Namespace }}{{ end }}]",
             "parse_kubeconfig": true
           },
           "style": "plain",
+          "template": "[{{ .Context }}{{ if .Namespace }} :: {{ .Namespace }}{{ end }}]",
           "type": "kubectl"
         },
         {
@@ -38,10 +39,10 @@
             "branch_max_length": 0,
             "fetch_stash_count": false,
             "fetch_status": false,
-            "fetch_upstream_icon": false,
-            "template": "[{{ .HEAD }}]"
+            "fetch_upstream_icon": false
           },
           "style": "plain",
+          "template": "[{{ .HEAD }}]",
           "type": "git"
         }
       ],
@@ -56,10 +57,10 @@
           "foreground": "darkGray",
           "properties": {
             "home_icon": "~",
-            "style": "full",
-            "template": "{{ .Path }}"
+            "style": "full"
           },
           "style": "plain",
+          "template": "{{ .Path }}",
           "type": "path"
         }
       ],
@@ -75,18 +76,16 @@
             "{{ if gt .Code 0 }}red{{ end }}"
           ],
           "properties": {
-            "always_enabled": false,
-            "template": "x "
+            "always_enabled": false
           },
           "style": "diamond",
+          "template": "x ",
           "type": "exit"
         },
         {
           "foreground": "#eeeeee",
-          "properties": {
-            "template": ">"
-          },
           "style": "plain",
+          "template": ">",
           "type": "text"
         }
       ],
@@ -94,5 +93,5 @@
     }
   ],
   "final_space": true,
-  "version": 1
+  "version": 2
 }

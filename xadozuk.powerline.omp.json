@@ -9,20 +9,21 @@
           "foreground": "#eeeeee",
           "properties": {
             "always_enabled": true,
-            "style": "round",
-            "template": " {{ .FormattedMs }} "
+            "style": "round"
           },
           "style": "diamond",
+          "template": " {{ .FormattedMs }} ",
           "type": "executiontime"
         },
         {
           "background": "blue",
           "foreground": "#eeeeee",
           "powerline_symbol": "\ue0b0",
-          "properties": {
-            "template": " \ufd03 {{ .Name }} {{ if eq .Origin \"PWSH\" }}\uf489{{ else }}\uf120{{ end }} "
-          },
           "style": "powerline",
+          "template": " \ufd03 {{ .Name }} {{ if eq .Origin \"PWSH\" }}\uf489{{ else }}\uf120{{ end }} ",
+          "properties": {
+            "source": "pwsh"
+          },
           "type": "az"
         },
         {
@@ -30,10 +31,10 @@
           "foreground": "#eeeeee",
           "powerline_symbol": "\ue0b0",
           "properties": {
-            "template": " \uf308 {{ .Context }}{{ if .Namespace }} :: {{ .Namespace }}{{ end }} ",
             "parse_kubeconfig": true
           },
           "style": "powerline",
+          "template": " \uf308 {{ .Context }}{{ if .Namespace }} :: {{ .Namespace }}{{ end }} ",
           "type": "kubectl"
         },
         {
@@ -45,10 +46,10 @@
             "branch_max_length": 0,
             "fetch_stash_count": false,
             "fetch_status": false,
-            "fetch_upstream_icon": false,
-            "template": " {{ .HEAD }} "
+            "fetch_upstream_icon": false
           },
           "style": "powerline",
+          "template": " {{ .HEAD }} ",
           "type": "git"
         }
       ],
@@ -63,10 +64,10 @@
           "foreground": "darkGray",
           "properties": {
             "home_icon": "~",
-            "style": "full",
-            "template": "\uf07b {{ .Path }} "
+            "style": "full"
           },
           "style": "plain",
+          "template": "\uf07b {{ .Path }} ",
           "type": "path"
         }
       ],
@@ -82,18 +83,16 @@
             "{{ if gt .Code 0 }}red{{ end }}"
           ],
           "properties": {
-            "always_enabled": false,
-            "template": "\uf7d3 "
+            "always_enabled": false
           },
           "style": "diamond",
+          "template": "\uf7d3 ",
           "type": "exit"
         },
         {
           "foreground": "#eeeeee",
-          "properties": {
-            "template": "\u276f"
-          },
           "style": "plain",
+          "template": "\u276f",
           "type": "text"
         }
       ],
@@ -101,5 +100,5 @@
     }
   ],
   "final_space": true,
-  "version": 1
+  "version": 2
 }

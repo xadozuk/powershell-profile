@@ -54,7 +54,7 @@ $OhMyPoshConfigFile =
         "~\AppData\Local\Programs\oh-my-posh\themes\jandedobbeleer.omp.json"
     }
 
-oh-my-posh --init --shell pwsh --config $OhMyPoshConfigFile | Invoke-Expression
+oh-my-posh init pwsh --config $OhMyPoshConfigFile | Invoke-Expression
 
 # Auto load my functions
 . Import-MyFunction
