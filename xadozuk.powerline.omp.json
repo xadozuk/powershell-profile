@@ -20,9 +20,20 @@
           "foreground": "#eeeeee",
           "powerline_symbol": "\ue0b0",
           "style": "powerline",
-          "template": " \ufd03 {{ .Name }} {{ if eq .Origin \"PWSH\" }}\uf489{{ else }}\uf120{{ end }} ",
+          "template": " \uebd8 {{ .Name }}",
           "properties": {
             "source": "pwsh"
+          },
+          "type": "az"
+        },
+        {
+          "background": "blue",
+          "foreground": "#eeeeee",
+          "powerline_symbol": "\ue0b0",
+          "style": "powerline",
+          "template": " \ufd03 {{ .Name }} ",
+          "properties": {
+            "source": "cli"
           },
           "type": "az"
         },
