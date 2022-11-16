@@ -28,6 +28,14 @@
         },
         {
           "background": "blue",
+          "foreground": "lightBlue",
+          "powerline_symbol": "\ue0b0",
+          "style": "powerline",
+          "template": "|",
+          "type": "text"
+        },
+        {
+          "background": "blue",
           "foreground": "#eeeeee",
           "powerline_symbol": "\ue0b0",
           "style": "powerline",
