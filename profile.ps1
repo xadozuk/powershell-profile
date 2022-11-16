@@ -42,7 +42,7 @@ $PSDefaultParameterValues = @{
 }
 
 # Prompt
-$OhMyPoshConfigFile = 
+$OhMyPoshConfigFile =
     if($null -ne $ENV:OHMYPOSH_MYTHEME_PATH)
     {
         if(Test-Powerline) { "$($ENV:OHMYPOSH_MYTHEME_PATH)\xadozuk.powerline.omp.json" }
@@ -63,11 +63,14 @@ oh-my-posh init pwsh --config $OhMyPoshConfigFile | Invoke-Expression
 Set-Alias -Name Watch -Value Watch-Command -Force
 #Set-Alias -Name code -Value code-insiders.cmd -Force
 
-if((Get-Module -Name PSReadLine).Version -ge [Version]"2.1.0")
-{
-    # PSReadline options
-    Set-PSReadLineOption -PredictionSource History   
-}
+$PSReadLineVersion = (Get-Module -Name PSReadLine).Version
+$PredictionSource = `
+    switch($PSReadLineOption)
+    {
+        { $_ -ge [Version]"2.2.0" } { "HistoryAndPlugin" }
+        { $_ -ge [Version]"2.1.0" } { "History" }
+        default { "None" }
+    }
 
 # PSReadline binding
 Set-PSReadLineKeyHandler -Key "Ctrl+f" -Function ForwardWord
