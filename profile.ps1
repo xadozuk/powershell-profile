@@ -65,12 +65,14 @@ Set-Alias -Name Watch -Value Watch-Command -Force
 
 $PSReadLineVersion = (Get-Module -Name PSReadLine).Version
 $PredictionSource = `
-    switch($PSReadLineOption)
+    switch($PSReadLineVersion)
     {
         { $_ -ge [Version]"2.2.0" } { "HistoryAndPlugin" }
         { $_ -ge [Version]"2.1.0" } { "History" }
         default { "None" }
     }
+
+Set-PSReadLineOption -PredictionSource $PredictionSource -PredictionViewStyle ListView
 
 # PSReadline binding
 Set-PSReadLineKeyHandler -Key "Ctrl+f" -Function ForwardWord
