@@ -31,7 +31,7 @@
           "foreground": "#eeeeee",
           "powerline_symbol": "\ue0b0",
           "style": "powerline",
-          "template": " \ufd03 {{ .Name }} ",
+          "template": "\ufd03 {{ .Name }} ",
           "properties": {
             "source": "cli"
           },

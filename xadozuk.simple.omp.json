@@ -17,9 +17,18 @@
         {
           "foreground": "blue",
           "style": "plain",
-          "template": "[{{ .Name }}]",
+          "template": "[{{ .Name }}",
           "properties": {
             "source": "pwsh"
+          },
+          "type": "az"
+        },
+        {
+          "foreground": "blue",
+          "style": "plain",
+          "template": "|{{ .Name }}]",
+          "properties": {
+            "source": "cli"
           },
           "type": "az"
         },
