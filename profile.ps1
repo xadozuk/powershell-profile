@@ -45,8 +45,8 @@ function Set-MacOsConfig
 
     [System.Environment]::SetEnvironmentVariable(
         'PATH',
-        "$($ASDF_BIN):$($ASDF_USER_SHIMS):" + 
-        "/opt/homebrew/bin:/opt/homebrew/sbin" + 
+        "$($ASDF_BIN):$($ASDF_USER_SHIMS):" +
+        "/opt/homebrew/bin:/opt/homebrew/sbin" +
         $ENV:PATH,
         [System.EnvironmentVariableTarget]::Process
     )
@@ -102,7 +102,7 @@ $PSReadLinePredictionSource = `
         elseif($PSReadLineVersion -ge [Version]"2.2.0") { "History" }
         else                                            { "None" }
 
-Set-PSReadLineOption -PredictionSource $PSReadLinePredictionSource -PredictionViewStyle ListView
+Set-PSReadLineOption -PredictionSource $PSReadLinePredictionSource -PredictionViewStyle ListView -EditMode Windows
 
 # PSReadline binding
 Set-PSReadLineKeyHandler -Key "Ctrl+f" -Function ForwardWord
