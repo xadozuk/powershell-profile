@@ -21,14 +21,15 @@ function Import-MyFunction
 
 function Test-Powerline
 {
-    return ($null -ne $env:WT_SESSION) -and ($env:TERM_PROGRAM -ne "vscode") -and -not $MySettings.DisablePowerlinePrompt
+    return  $MySettings.ForcePowerlinePrompt -or `
+            ($null -ne $env:WT_SESSION) -and ($env:TERM_PROGRAM -ne "vscode") -and -not $MySettings.DisablePowerlinePrompt
 }
 
 #endregion
 
 #region PATH
 
-function Set-MacOsPath
+function Set-MacOsConfig
 {
     $ASDF_BIN = "$($env:HOME)/.asdf/bin"
     $ASDF_USER_SHIMS = "$($env:HOME)/.asdf/shims"
@@ -49,9 +50,10 @@ function Set-MacOsPath
         $ENV:PATH,
         [System.EnvironmentVariableTarget]::Process
     )
-}
 
-if($isMacOs) { Set-MacOsPath }
+    $MySettings.ForcePowerlinePrompt = $env:TERM_PROGRAM -eq "iTerm.app"
+    $env:OHMYPOSH_MYTHEME_PATH = "$($env:HOME)/.config/powershell"
+}
 
 #endregion
 
@@ -61,6 +63,8 @@ if($null -eq $MySettings)
         DisablePowerlinePrompt = $false
     }
 }
+
+if($isMacOs) { Set-MacOsConfig }
 
 $PSDefaultParameterValues = @{
     # Install module in user scope by default (no need for admin prompt)
