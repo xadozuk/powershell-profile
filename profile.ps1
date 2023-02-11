@@ -26,6 +26,35 @@ function Test-Powerline
 
 #endregion
 
+#region PATH
+
+function Set-MacOsPath
+{
+    $ASDF_BIN = "$($env:HOME)/.asdf/bin"
+    $ASDF_USER_SHIMS = "$($env:HOME)/.asdf/shims"
+
+    [System.Environment]::SetEnvironmentVariable('ASDF_BIN', $ASDF_BIN, [EnvironmentVariableTarget]::Process)
+    [System.Environment]::SetEnvironmentVariable('ASDF_USER_SHIMS', $ASDF_USER_SHIMS, [EnvironmentVariableTarget]::Process)
+
+    [System.Environment]::SetEnvironmentVariable('HOMEBREW_PREFIX','/opt/homebrew',[System.EnvironmentVariableTarget]::Process)
+    [System.Environment]::SetEnvironmentVariable('HOMEBREW_CELLAR','/opt/homebrew/Cellar',[System.EnvironmentVariableTarget]::Process)
+    [System.Environment]::SetEnvironmentVariable('HOMEBREW_REPOSITORY','/opt/homebrew',[System.EnvironmentVariableTarget]::Process)
+    [System.Environment]::SetEnvironmentVariable('MANPATH',$('/opt/homebrew/share/man'+$(if(${ENV:MANPATH}){':'+${ENV:MANPATH}})+':'),[System.EnvironmentVariableTarget]::Process)
+    [System.Environment]::SetEnvironmentVariable('INFOPATH',$('/opt/homebrew/share/info'+$(if(${ENV:INFOPATH}){':'+${ENV:INFOPATH}})),[System.EnvironmentVariableTarget]::Process)
+
+    [System.Environment]::SetEnvironmentVariable(
+        'PATH',
+        "$($ASDF_BIN):$($ASDF_USER_SHIMS):" + 
+        "/opt/homebrew/bin:/opt/homebrew/sbin" + 
+        $ENV:PATH,
+        [System.EnvironmentVariableTarget]::Process
+    )
+}
+
+if($isMacOs) { Set-MacOsPath }
+
+#endregion
+
 if($null -eq $MySettings)
 {
     $MySettings = @{
