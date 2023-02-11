@@ -53,6 +53,8 @@ function Set-MacOsConfig
 
     $MySettings.ForcePowerlinePrompt = $env:TERM_PROGRAM -eq "iTerm.app"
     $env:OHMYPOSH_MYTHEME_PATH = "$($env:HOME)/.config/powershell"
+
+    $env:PSMYHOME = "$($env:HOME)/development/my/powershell-gallery"
 }
 
 #endregion
