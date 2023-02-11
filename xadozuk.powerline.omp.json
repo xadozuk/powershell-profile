@@ -1,8 +1,97 @@
 {
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
   "blocks": [
-
-
+    {
+      "alignment": "left",
+      "segments": [
+        {
+          "background": "green",
+          "foreground": "#eeeeee",
+          "properties": {
+            "always_enabled": true,
+            "style": "round"
+          },
+          "style": "diamond",
+          "template": " {{ .FormattedMs }} ",
+          "type": "executiontime"
+        },
+        {
+          "background": "blue",
+          "foreground": "#eeeeee",
+          "powerline_symbol": "\ue0b0",
+          "style": "powerline",
+          "template": " \uebd8 {{ .Name }}",
+          "properties": {
+            "source": "pwsh"
+          },
+          "type": "az"
+        },
+        {
+          "background": "blue",
+          "foreground": "lightBlue",
+          "powerline_symbol": "\ue0b0",
+          "style": "powerline",
+          "template": "|",
+          "type": "text"
+        },
+        {
+          "background": "blue",
+          "foreground": "#eeeeee",
+          "powerline_symbol": "\ue0b0",
+          "style": "powerline",
+          "template": "\ufd03 {{ .Name }} ",
+          "properties": {
+            "source": "cli"
+          },
+          "type": "az"
+        },
+        {
+          "background": "#c19c00",
+          "foreground": "#eeeeee",
+          "powerline_symbol": "\ue0b0",
+          "properties": {
+            "parse_kubeconfig": true
+          },
+          "style": "powerline",
+          "template": " \uf308 {{ .Context }}{{ if .Namespace }} :: {{ .Namespace }}{{ end }} ",
+          "type": "kubectl"
+        },
+        {
+          "background": "lightCyan",
+          "foreground": "black",
+          "powerline_symbol": "\ue0b0",
+          "properties": {
+            "branch_icon": "\ue725 ",
+            "branch_max_length": 0,
+            "fetch_stash_count": false,
+            "fetch_status": false,
+            "fetch_upstream_icon": false
+          },
+          "style": "powerline",
+          "template": " {{ .HEAD }} ",
+          "type": "git"
+        }
+      ],
+      "type": "prompt"
+    },
+    {
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "background": "transparent",
+          "foreground": "darkGray",
+          "properties": {
+            "home_icon": "~",
+            "style": "full"
+          },
+          "style": "plain",
+          "template": "\uf07b {{ .Path }} ",
+          "type": "path"
+        }
+      ],
+      "type": "prompt"
+    },
     {
       "alignment": "left",
       "newline": true,
