@@ -55,6 +55,8 @@ function Set-MacOsConfig
     $env:OHMYPOSH_MYTHEME_PATH = "$($env:HOME)/.config/powershell"
 
     $env:PSMYHOME = "$($env:HOME)/development/my/powershell-gallery"
+
+    $env:POSH_AZURE_ENABLED = $true
 }
 
 #endregion
