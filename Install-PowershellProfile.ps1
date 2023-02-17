@@ -30,7 +30,7 @@ Write-Verbose "Linking powershell profile..."
 $ProfilePath = Split-Path -Path $PROFILE.CurrentUserAllHosts -Parent
 
 # On Windows, require Run-as Admin
-New-Item -Path $ProfilePath -ItemType SymbolicLink -Target $PSScriptRoot -Force | Out-Null
+New-Item -Path "$ProfilePath/profile.ps1" -ItemType SymbolicLink -Target "$PSScriptRoot/profile.ps1" -Force | Out-Null
 
 # Install oh-my-posh
 if($null -eq (Get-Command "oh-my-posh" -ErrorAction SilentlyContinue) -or $ForceInstallOhMyPosh)
