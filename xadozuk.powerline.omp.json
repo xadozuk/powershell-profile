@@ -32,7 +32,7 @@
           "foreground": "lightBlue",
           "powerline_symbol": "\ue0b0",
           "style": "powerline",
-          "template": "{{ if .Segments.AzPwsh.Output }}|{{ end }}",
+          "template": "{{ if .Segments.AzPwsh.Name }}|{{ end }}",
           "type": "text"
         },
         {
