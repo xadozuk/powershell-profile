@@ -3,7 +3,7 @@
 [CmdletBinding()]
 param(
     [Parameter()]
-    [string] $CheckoutPath = "$($ENV:HOME)/development/my",
+    [string] $CheckoutPath = "$($HOME)/development/my",
 
     [Parameter()]
     [string] $GalleryFolderName = "powershell-gallery",
