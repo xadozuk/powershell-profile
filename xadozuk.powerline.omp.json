@@ -24,14 +24,15 @@
           "properties": {
             "source": "pwsh"
           },
-          "type": "az"
+          "type": "az",
+          "alias": "AzPwsh"
         },
         {
           "background": "blue",
           "foreground": "lightBlue",
           "powerline_symbol": "\ue0b0",
           "style": "powerline",
-          "template": "|",
+          "template": "{{ if .Segments.AzPwsh.Output }}|{{ end }}",
           "type": "text"
         },
         {

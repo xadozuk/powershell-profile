@@ -77,8 +77,8 @@ function Set-NonWindowsOsConfig
         [System.Environment]::SetEnvironmentVariable($_.Key, $_.Value, [EnvironmentVariableTarget]::Process)
     }
 
-    $env:OHMYPOSH_MYTHEME_PATH = "$($env:HOME)/.config/powershell"
-    $env:PSMYHOME = "$($env:HOME)/development/my/powershell-gallery"
+    $env:OHMYPOSH_MYTHEME_PATH = "$($HOME)/development/my/powershell-profile"
+    $env:PSMYHOME = "$($HOME)/development/my/powershell-gallery"
 }
 
 #endregion
