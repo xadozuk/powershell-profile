@@ -21,39 +21,63 @@ function Import-MyFunction
 
 function Test-Powerline
 {
-    return  $MySettings.ForcePowerlinePrompt -or `
-            ($null -ne $env:WT_SESSION) -and ($env:TERM_PROGRAM -ne "vscode") -and -not $MySettings.DisablePowerlinePrompt
+    return -not $MySettings.DisablePowerlinePrompt -and $env:TERM_PROGRAM -ne "vscode" -and (
+        ($null -ne $env:WT_SESSION) -or     # Inside Windows terminal
+        ($env:TERM -eq "xterm-256color")    # Inside a compatible *nix terminal
+
+    )
 }
 
 #endregion
 
 #region PATH
 
-function Set-MacOsConfig
+function Get-MacOsConfig
 {
+    return @{
+        Paths = @(
+            "/opt/homebrew/bin",
+            "/opt/homebrew/sbin"
+        )
+        EnvironmentVariables = @{
+            HOMEBREW_PREFIX     = "/opt/homebrew"
+            HOMEBREW_CELLAR     = "/opt/homebrew/Cellar"
+            HOMEBREW_REPOSITORY = "/opt/homebrew"
+            MANPATH             = @("/opt/homebrew/share/man", $ENV:MANPATH) -join [IO.Path]::PathSeparator
+            INFOPATH            = @("/opt/homebrew/share/INFO", $ENV:INFOPATH) -join [IO.Path]::PathSeparator
+        }
+    }
+}
+
+function Get-LinuxConfig
+{
+    return @{
+        Paths = @()
+        EnvironmentVariables = @{}
+    }
+}
+
+function Set-NonWindowsOsConfig
+{
+    $Config = if($isMacOs) { Get-MacOsConfig }
+              elseif($isLinux) { Get-LinuxConfig }
+
     $ASDF_BIN = "$($env:HOME)/.asdf/bin"
     $ASDF_USER_SHIMS = "$($env:HOME)/.asdf/shims"
 
-    [System.Environment]::SetEnvironmentVariable('ASDF_BIN', $ASDF_BIN, [EnvironmentVariableTarget]::Process)
-    [System.Environment]::SetEnvironmentVariable('ASDF_USER_SHIMS', $ASDF_USER_SHIMS, [EnvironmentVariableTarget]::Process)
-
-    [System.Environment]::SetEnvironmentVariable('HOMEBREW_PREFIX','/opt/homebrew',[System.EnvironmentVariableTarget]::Process)
-    [System.Environment]::SetEnvironmentVariable('HOMEBREW_CELLAR','/opt/homebrew/Cellar',[System.EnvironmentVariableTarget]::Process)
-    [System.Environment]::SetEnvironmentVariable('HOMEBREW_REPOSITORY','/opt/homebrew',[System.EnvironmentVariableTarget]::Process)
-    [System.Environment]::SetEnvironmentVariable('MANPATH',$('/opt/homebrew/share/man'+$(if(${ENV:MANPATH}){':'+${ENV:MANPATH}})+':'),[System.EnvironmentVariableTarget]::Process)
-    [System.Environment]::SetEnvironmentVariable('INFOPATH',$('/opt/homebrew/share/info'+$(if(${ENV:INFOPATH}){':'+${ENV:INFOPATH}})),[System.EnvironmentVariableTarget]::Process)
+    $PrependPath = @($ASDF_BIN, $ASDF_USER_SHIMS) + $Config.Paths
 
     [System.Environment]::SetEnvironmentVariable(
         'PATH',
-        "$($ASDF_BIN):$($ASDF_USER_SHIMS):" +
-        "/opt/homebrew/bin:/opt/homebrew/sbin" +
-        $ENV:PATH,
+        $PrependPath + @($ENV:PATH) -join [IO.Path]::PathSeparator,
         [System.EnvironmentVariableTarget]::Process
     )
 
-    $MySettings.ForcePowerlinePrompt = $env:TERM_PROGRAM -eq "iTerm.app"
-    $env:OHMYPOSH_MYTHEME_PATH = "$($env:HOME)/.config/powershell"
+    $Config.EnvironmentVariables.GetEnumerator() | Foreach-Object {
+        [System.Environment]::SetEnvironmentVariable($_.Key, $_.Value, [EnvironmentVariableTarget]::Process)
+    }
 
+    $env:OHMYPOSH_MYTHEME_PATH = "$($env:HOME)/.config/powershell"
     $env:PSMYHOME = "$($env:HOME)/development/my/powershell-gallery"
 }
 
@@ -66,7 +90,7 @@ if($null -eq $MySettings)
     }
 }
 
-if($isMacOs) { Set-MacOsConfig }
+if(-not $IsWindows) { Set-NonWindowsOsConfig }
 
 $PSDefaultParameterValues = @{
     # Install module in user scope by default (no need for admin prompt)
@@ -80,18 +104,21 @@ $PSDefaultParameterValues = @{
 $OhMyPoshConfigFile =
     if($null -ne $ENV:OHMYPOSH_MYTHEME_PATH)
     {
-        if(Test-Powerline) { "$($ENV:OHMYPOSH_MYTHEME_PATH)\xadozuk.powerline.omp.json" }
-        else { "$($ENV:OHMYPOSH_MYTHEME_PATH)\xadozuk.simple.omp.json" }
+        if(Test-Powerline) { "$($ENV:OHMYPOSH_MYTHEME_PATH)/xadozuk.powerline.omp.json" }
+        else { "$($ENV:OHMYPOSH_MYTHEME_PATH)/xadozuk.simple.omp.json" }
     }
     else
     {
         Write-Host -ForegroundColor Cyan "You can override Oh My Posh configuration by setting envinronment variable `OHMYPOSH_MYTHEME_PATH"
-        "~\AppData\Local\Programs\oh-my-posh\themes\jandedobbeleer.omp.json"
+        ""
     }
 
 oh-my-posh init pwsh --config $OhMyPoshConfigFile | Invoke-Expression
 
-$env:POSH_AZURE_ENABLED = $true
+if($null -ne (Get-Module Az -ListAvailable))
+{
+    $env:POSH_AZURE_ENABLED = $true
+}
 
 # Auto load my functions
 . Import-MyFunction
