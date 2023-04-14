@@ -133,6 +133,13 @@ $PSReadLinePredictionSource = `
         elseif($PSReadLineVersion -ge [Version]"2.2.0") { "History" }
         else                                            { "None" }
 
+# PSReadLine Predictors
+if($PSReadLinePredictionSource -eq "HistoryAndPlugin")
+{
+    Import-Module CompletionPredictor
+    Import-Module Az.Tools.Predictor
+}
+
 Set-PSReadLineOption -PredictionSource $PSReadLinePredictionSource -PredictionViewStyle ListView -EditMode Windows
 
 # PSReadline binding
