@@ -37,7 +37,8 @@ function Get-MacOsConfig
     return @{
         Paths = @(
             "/opt/homebrew/bin",
-            "/opt/homebrew/sbin"
+            "/opt/homebrew/sbin",
+            "$($HOME)/.cargo/bin"
         )
         EnvironmentVariables = @{
             HOMEBREW_PREFIX     = "/opt/homebrew"
