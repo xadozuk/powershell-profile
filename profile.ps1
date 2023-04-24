@@ -44,6 +44,7 @@ function Get-MacOsConfig
             HOMEBREW_PREFIX     = "/opt/homebrew"
             HOMEBREW_CELLAR     = "/opt/homebrew/Cellar"
             HOMEBREW_REPOSITORY = "/opt/homebrew"
+            LIBRARY_PATH        = "$env:LIBRARY_PATH:/opt/homebrew/lib"
             MANPATH             = @("/opt/homebrew/share/man", $ENV:MANPATH) -join [IO.Path]::PathSeparator
             INFOPATH            = @("/opt/homebrew/share/INFO", $ENV:INFOPATH) -join [IO.Path]::PathSeparator
         }
