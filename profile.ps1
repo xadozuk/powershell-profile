@@ -37,12 +37,14 @@ function Get-MacOsConfig
     return @{
         Paths = @(
             "/opt/homebrew/bin",
-            "/opt/homebrew/sbin"
+            "/opt/homebrew/sbin",
+            "$($HOME)/.cargo/bin"
         )
         EnvironmentVariables = @{
             HOMEBREW_PREFIX     = "/opt/homebrew"
             HOMEBREW_CELLAR     = "/opt/homebrew/Cellar"
             HOMEBREW_REPOSITORY = "/opt/homebrew"
+            LIBRARY_PATH        = "$env:LIBRARY_PATH:/opt/homebrew/lib"
             MANPATH             = @("/opt/homebrew/share/man", $ENV:MANPATH) -join [IO.Path]::PathSeparator
             INFOPATH            = @("/opt/homebrew/share/INFO", $ENV:INFOPATH) -join [IO.Path]::PathSeparator
         }
@@ -133,6 +135,13 @@ $PSReadLinePredictionSource = `
         if($PSReadLineVersion -ge [Version]"2.2.0")     { "HistoryAndPlugin" }
         elseif($PSReadLineVersion -ge [Version]"2.2.0") { "History" }
         else                                            { "None" }
+
+# PSReadLine Predictors
+if($PSReadLinePredictionSource -eq "HistoryAndPlugin")
+{
+    Import-Module CompletionPredictor
+    Import-Module Az.Tools.Predictor
+}
 
 Set-PSReadLineOption -PredictionSource $PSReadLinePredictionSource -PredictionViewStyle ListView -EditMode Windows
 

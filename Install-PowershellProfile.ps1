@@ -52,6 +52,10 @@ if($null -eq (Get-Command "oh-my-posh" -ErrorAction SilentlyContinue) -or $Force
     }
 }
 
+# Required modules
+Install-Module -Name CompletionPredictor -Scope CurrentUser -Force
+Install-Module -Name Az.Tools.Predictor -Scope CurrentUser -Force
+
 $CurrentLocation | Push-Location
 
 . $PROFILE.CurrentUserAllHosts
