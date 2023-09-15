@@ -64,8 +64,9 @@ function Set-NonWindowsOsConfig
 
     $ASDF_BIN = "$($env:HOME)/.asdf/bin"
     $ASDF_USER_SHIMS = "$($env:HOME)/.asdf/shims"
+    $TERRAMORPH_SHIMS = "$($env:HOME)/.terramorph/shims"
 
-    $PrependPath = @($ASDF_BIN, $ASDF_USER_SHIMS) + $Config.Paths
+    $PrependPath = @($ASDF_BIN, $ASDF_USER_SHIMS, $TERRAMORPH_SHIMS) + $Config.Paths
 
     [System.Environment]::SetEnvironmentVariable(
         'PATH',
