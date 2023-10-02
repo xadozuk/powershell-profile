@@ -54,7 +54,9 @@ function Get-MacOsConfig
 function Get-LinuxConfig
 {
     return @{
-        Paths = @()
+        Paths = @(
+            "$($HOME)/.local/bin"
+        )
         EnvironmentVariables = @{}
     }
 }
