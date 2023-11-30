@@ -55,7 +55,8 @@ function Get-LinuxConfig
 {
     return @{
         Paths = @(
-            "$($HOME)/.local/bin"
+            "$($HOME)/.local/bin",
+            "$($HOME)/.cargo/bin"
         )
         EnvironmentVariables = @{}
     }
