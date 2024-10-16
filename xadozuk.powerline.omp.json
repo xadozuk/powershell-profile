@@ -40,7 +40,7 @@
           "foreground": "#eeeeee",
           "powerline_symbol": "\ue0b0",
           "style": "powerline",
-          "template": "\ufd03 {{ .Name }} ",
+          "template": "\udb82\udc05 {{ .Name }} ",
           "properties": {
             "source": "cli"
           },
@@ -106,7 +106,7 @@
             "always_enabled": false
           },
           "style": "diamond",
-          "template": "\uf7d3 ",
+          "template": "\udb80\uded4 ",
           "type": "exit"
         },
         {
