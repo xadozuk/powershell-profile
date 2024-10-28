@@ -91,6 +91,7 @@ function Set-NonWindowsOsConfig
 
   $env:OHMYPOSH_MYTHEME_PATH = "$($HOME)/development/my/powershell-profile"
   $env:PSMYHOME = "$($HOME)/development/my/powershell-gallery"
+  $env:EDITOR = "nvim"
 }
 
 #endregion
@@ -144,6 +145,7 @@ if($null -ne (Get-Module Az -ListAvailable))
 if($null -ne (Get-Command zoxide -ErrorAction SilentlyContinue))
 {
   Invoke-Expression (& { zoxide init powershell | Out-String })
+  Set-Alias -Name cd -Value z -Option AllScope -Scope Global
 }
 
 # Auto load my functions
