@@ -114,7 +114,6 @@ function Set-PSReadLineConfig
     # PSReadLine Predictors
     if($PSReadLinePredictionSource -eq "HistoryAndPlugin")
     {
-        $VerbosePreference = "Continue"
         Import-Module CompletionPredictor
         Import-Module Az.Tools.Predictor
     }
