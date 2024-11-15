@@ -94,6 +94,54 @@ function Set-NonWindowsOsConfig
     $env:EDITOR = "nvim"
 }
 
+function Set-PSReadLineConfig
+{
+    $PSReadLineVersion = (Get-Module -Name PSReadLine).Version
+    $PSReadLinePredictionSource = `
+        if($PSReadLineVersion -ge [Version]"2.2.0")
+    {
+        "HistoryAndPlugin" 
+    }
+    elseif($PSReadLineVersion -ge [Version]"2.2.0")
+    {
+        "History" 
+    }
+    else
+    {
+        "None" 
+    }
+
+    # PSReadLine Predictors
+    if($PSReadLinePredictionSource -eq "HistoryAndPlugin")
+    {
+        $VerbosePreference = "Continue"
+        Import-Module CompletionPredictor
+        Import-Module Az.Tools.Predictor
+    }
+
+    Set-PSReadLineOption -PredictionSource $PSReadLinePredictionSource -PredictionViewStyle ListView -EditMode Windows
+
+    # Remove PSFzf binding
+    Remove-PSReadLineKeyHandler -Chord "Ctrl+r"
+    Remove-PSReadLineKeyHandler -Chord "Alt+c"
+
+    # Remove binding for Linux compatibility (inside TMUX)
+    Set-PSReadLineKeyHandler -Chord "Ctrl+Enter" -Function AcceptLine
+
+    # PSReadline binding
+    Set-PSReadLineKeyHandler -Chord "Ctrl+f" -Function ForwardWord
+    Set-PSReadLineKeyHandler -Chord "Ctrl+t" -ScriptBlock { Open-TmuxSession }
+
+    if(Test-Powerline)
+    { 
+        Set-PSReadLineOption -PromptText "$([char]::ConvertFromUtf32(0x276F)) " 
+    }
+    else
+    {
+        Set-PSReadLineOption -PromptText "> " 
+    }
+}
+
 #endregion
 
 if($null -eq $MySettings)
@@ -156,46 +204,10 @@ Set-Alias -Name Watch -Value Watch-Command -Force
 #Set-Alias -Name code -Value code-insiders.cmd -Force
 Set-Alias -Name podman -Value podman-remote -Force
 
-$PSReadLineVersion = (Get-Module -Name PSReadLine).Version
-$PSReadLinePredictionSource = `
-    if($PSReadLineVersion -ge [Version]"2.2.0")
+# Detect when we are not in a interactive session (pwsh spawned by another process, usually as shell for executing vs extension, nvim command, etc...)
+# Import-Module predictors cause the shell to hang in this case
+if(-not [Console]::IsOutputRedirected)
 {
-    "HistoryAndPlugin" 
-}
-elseif($PSReadLineVersion -ge [Version]"2.2.0")
-{
-    "History" 
-}
-else
-{
-    "None" 
+    Set-PSReadLineConfig
 }
 
-# PSReadLine Predictors
-if($PSReadLinePredictionSource -eq "HistoryAndPlugin")
-{
-    Import-Module CompletionPredictor
-    Import-Module Az.Tools.Predictor
-}
-
-Set-PSReadLineOption -PredictionSource $PSReadLinePredictionSource -PredictionViewStyle ListView -EditMode Windows
-
-# Remove PSFzf binding
-Remove-PSReadLineKeyHandler -Chord "Ctrl+r"
-Remove-PSReadLineKeyHandler -Chord "Alt+c"
-
-# Remove binding for Linux compatibility (inside TMUX)
-Set-PSReadLineKeyHandler -Chord "Ctrl+Enter" -Function AcceptLine
-
-# PSReadline binding
-Set-PSReadLineKeyHandler -Chord "Ctrl+f" -Function ForwardWord
-Set-PSReadLineKeyHandler -Chord "Ctrl+t" -ScriptBlock { Open-TmuxSession }
-
-if(Test-Powerline)
-{ 
-    Set-PSReadLineOption -PromptText "$([char]::ConvertFromUtf32(0x276F)) " 
-}
-else
-{
-    Set-PSReadLineOption -PromptText "> " 
-}

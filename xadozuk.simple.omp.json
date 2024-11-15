@@ -2,105 +2,115 @@
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
   "blocks": [
     {
+      "type": "prompt",
       "alignment": "left",
       "segments": [
         {
-          "foreground": "green",
           "properties": {
             "always_enabled": true,
+            "cache_duration": "none",
             "style": "round"
           },
-          "style": "plain",
           "template": "[{{ .FormattedMs }}]",
-          "type": "executiontime"
+          "foreground": "green",
+          "type": "executiontime",
+          "style": "plain"
         },
         {
-          "foreground": "blue",
-          "style": "plain",
-          "template": "[{{ .Name }}",
           "properties": {
+            "cache_duration": "none",
             "source": "pwsh"
           },
-          "type": "az"
+          "template": "[{{ .Name }}",
+          "foreground": "blue",
+          "type": "az",
+          "style": "plain"
         },
         {
-          "foreground": "blue",
-          "style": "plain",
-          "template": "|{{ .Name }}]",
           "properties": {
+            "cache_duration": "none",
             "source": "cli"
           },
-          "type": "az"
+          "template": "|{{ .Name }}]",
+          "foreground": "blue",
+          "type": "az",
+          "style": "plain"
         },
         {
-          "foreground": "#c19c00",
           "properties": {
+            "cache_duration": "none",
             "parse_kubeconfig": true
           },
-          "style": "plain",
           "template": "[{{ .Context }}{{ if .Namespace }} :: {{ .Namespace }}{{ end }}]",
-          "type": "kubectl"
+          "foreground": "#c19c00",
+          "type": "kubectl",
+          "style": "plain"
         },
         {
-          "foreground": "lightCyan",
           "properties": {
             "branch_icon": "",
             "branch_max_length": 0,
+            "cache_duration": "none",
             "fetch_stash_count": false,
             "fetch_status": false,
             "fetch_upstream_icon": false
           },
-          "style": "plain",
           "template": "[{{ .HEAD }}]",
-          "type": "git"
+          "foreground": "lightCyan",
+          "type": "git",
+          "style": "plain"
         }
-      ],
-      "type": "prompt"
+      ]
     },
     {
+      "type": "prompt",
       "alignment": "left",
-      "newline": true,
       "segments": [
         {
-          "background": "transparent",
-          "foreground": "darkGray",
           "properties": {
+            "cache_duration": "none",
             "home_icon": "~",
             "style": "full"
           },
-          "style": "plain",
           "template": "{{ .Path }}",
-          "type": "path"
+          "foreground": "darkGray",
+          "background": "transparent",
+          "type": "path",
+          "style": "plain"
         }
       ],
-      "type": "prompt"
+      "newline": true
     },
     {
+      "type": "prompt",
       "alignment": "left",
-      "newline": true,
       "segments": [
         {
+          "properties": {
+            "always_enabled": false,
+            "cache_duration": "none"
+          },
+          "template": "x ",
           "foreground": "#eeeeee",
+          "type": "exit",
+          "style": "diamond",
           "foreground_templates": [
             "{{ if gt .Code 0 }}red{{ end }}"
-          ],
-          "properties": {
-            "always_enabled": false
-          },
-          "style": "diamond",
-          "template": "x ",
-          "type": "exit"
+          ]
         },
         {
-          "foreground": "#eeeeee",
-          "style": "plain",
+          "properties": {
+            "cache_duration": "none"
+          },
           "template": ">",
-          "type": "text"
+          "foreground": "#eeeeee",
+          "type": "text",
+          "style": "plain"
         }
       ],
-      "type": "prompt"
+      "newline": true
     }
   ],
-  "final_space": true,
-  "version": 2
+  "version": 3,
+  "final_space": true
 }
