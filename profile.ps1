@@ -38,7 +38,8 @@ function Get-MacOsConfig
         Paths = @(
             "/opt/homebrew/bin",
             "/opt/homebrew/sbin",
-            "$($HOME)/.cargo/bin"
+            "$($HOME)/.cargo/bin",
+            "/usr/local/bin"
         )
         EnvironmentVariables = @{
             HOMEBREW_PREFIX     = "/opt/homebrew"
@@ -65,12 +66,12 @@ function Get-LinuxConfig
 function Set-NonWindowsOsConfig
 {
     $Config = if($isMacOs)
-    { 
-        Get-MacOsConfig 
+    {
+        Get-MacOsConfig
     }
     elseif($isLinux)
     {
-        Get-LinuxConfig 
+        Get-LinuxConfig
     }
 
     $ASDF_BIN = "$($env:HOME)/.asdf/bin"
@@ -100,15 +101,15 @@ function Set-PSReadLineConfig
     $PSReadLinePredictionSource = `
         if($PSReadLineVersion -ge [Version]"2.2.0")
     {
-        "HistoryAndPlugin" 
+        "HistoryAndPlugin"
     }
     elseif($PSReadLineVersion -ge [Version]"2.2.0")
     {
-        "History" 
+        "History"
     }
     else
     {
-        "None" 
+        "None"
     }
 
     # PSReadLine Predictors
@@ -132,12 +133,12 @@ function Set-PSReadLineConfig
     Set-PSReadLineKeyHandler -Chord "Ctrl+t" -ScriptBlock { Open-TmuxSession }
 
     if(Test-Powerline)
-    { 
-        Set-PSReadLineOption -PromptText "$([char]::ConvertFromUtf32(0x276F)) " 
+    {
+        Set-PSReadLineOption -PromptText "$([char]::ConvertFromUtf32(0x276F)) "
     }
     else
     {
-        Set-PSReadLineOption -PromptText "> " 
+        Set-PSReadLineOption -PromptText "> "
     }
 }
 
@@ -169,11 +170,11 @@ if($null -ne $ENV:OHMYPOSH_MYTHEME_PATH)
 {
     if(Test-Powerline)
     {
-        "$($ENV:OHMYPOSH_MYTHEME_PATH)/xadozuk.powerline.omp.json" 
+        "$($ENV:OHMYPOSH_MYTHEME_PATH)/xadozuk.powerline.omp.json"
     }
     else
     {
-        "$($ENV:OHMYPOSH_MYTHEME_PATH)/xadozuk.simple.omp.json" 
+        "$($ENV:OHMYPOSH_MYTHEME_PATH)/xadozuk.simple.omp.json"
     }
 }
 else
