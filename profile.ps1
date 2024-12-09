@@ -131,6 +131,7 @@ function Set-PSReadLineConfig
     # PSReadline binding
     Set-PSReadLineKeyHandler -Chord "Ctrl+f" -Function ForwardWord
     Set-PSReadLineKeyHandler -Chord "Ctrl+t" -ScriptBlock { Open-TmuxSession }
+    Set-PSReadLineKeyHandler -Chord "Ctrl+r" -Function ReverseSearchHistory
 
     if(Test-Powerline)
     {
