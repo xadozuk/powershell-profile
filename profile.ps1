@@ -130,8 +130,9 @@ function Set-PSReadLineConfig
 
     # PSReadline binding
     Set-PSReadLineKeyHandler -Chord "Ctrl+f" -Function ForwardWord
-    Set-PSReadLineKeyHandler -Chord "Ctrl+t" -ScriptBlock { Open-TmuxSession }
     Set-PSReadLineKeyHandler -Chord "Ctrl+r" -Function ReverseSearchHistory
+
+    Set-PSReadLineKeyHandler -Chord "Ctrl+t" -ScriptBlock { Open-TmuxSession }
 
     if(Test-Powerline)
     {
@@ -195,6 +196,11 @@ if($null -ne (Get-Command zoxide -ErrorAction SilentlyContinue))
 {
     Invoke-Expression (& { zoxide init powershell | Out-String })
     Set-Alias -Name cd -Value z -Option AllScope -Scope Global
+}
+
+if(Test-Path -PathType Leaf -Path "~/.tmux/plugins/tmux-session-wizard/bin/t")
+{
+    Set-Alias -Name t -Value "~/.tmux/plugins/tmux-session-wizard/bin/t"
 }
 
 # Auto load my functions
