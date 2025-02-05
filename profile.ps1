@@ -23,8 +23,8 @@ function Test-Powerline
 {
     return -not $MySettings.DisablePowerlinePrompt -and $env:TERM_PROGRAM -ne "vscode" -and (
         ($null -ne $env:WT_SESSION) -or     # Inside Windows terminal
-        ($env:TERM -eq "xterm-256color" -or $env:TERM -eq "tmux-256color")    # Inside a compatible *nix terminal
-
+        # Inside a compatible *nix terminal
+        ($env:TERM -in @("xterm-256color", "tmux-256color", "xterm-ghostty"))
     )
 }
 
@@ -131,6 +131,8 @@ function Set-PSReadLineConfig
     # PSReadline binding
     Set-PSReadLineKeyHandler -Chord "Ctrl+f" -Function ForwardWord
     Set-PSReadLineKeyHandler -Chord "Ctrl+r" -Function ReverseSearchHistory
+
+    Set-PSReadLineKeyHandler -Chord "Tab" -Function MenuComplete
 
     Set-PSReadLineKeyHandler -Chord "Ctrl+t" -ScriptBlock { Open-TmuxSession }
 
