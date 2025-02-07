@@ -36,9 +36,10 @@ function Get-MacOsConfig
 {
     return @{
         Paths = @(
-            "/opt/homebrew/bin",
-            "/opt/homebrew/sbin",
-            "$($HOME)/.cargo/bin",
+            "$($HOME)/.local/share/mise/shims"
+            "$($HOME)/.cargo/bin"
+            "/opt/homebrew/bin"
+            "/opt/homebrew/sbin"
             "/usr/local/bin"
         )
         EnvironmentVariables = @{
@@ -56,7 +57,8 @@ function Get-LinuxConfig
 {
     return @{
         Paths = @(
-            "$($HOME)/.local/bin",
+            "$($HOME)/.local/share/mise/shims"
+            "$($HOME)/.local/bin"
             "$($HOME)/.cargo/bin"
         )
         EnvironmentVariables = @{}
@@ -65,24 +67,25 @@ function Get-LinuxConfig
 
 function Set-NonWindowsOsConfig
 {
-    $Config = if($isMacOs)
+    $Config = if($IsMacOs)
     {
         Get-MacOsConfig
     }
-    elseif($isLinux)
+    elseif($IsLinux)
     {
         Get-LinuxConfig
     }
 
-    $ASDF_BIN = "$($env:HOME)/.asdf/bin"
-    $ASDF_USER_SHIMS = "$($env:HOME)/.asdf/shims"
-    $TERRAMORPH_SHIMS = "$($env:HOME)/.terramorph/shims"
+    $PrependPath = @(
+        "$($env:HOME)/.terramorph/shims",
+        "$($env:HOME)/.local/share/bob/nvim-bin"
+    )
 
-    $PrependPath = @($ASDF_BIN, $ASDF_USER_SHIMS, $TERRAMORPH_SHIMS) + $Config.Paths
+    $CurrentPath = $env:PATH -split [IO.Path]::PathSeparator
 
     [System.Environment]::SetEnvironmentVariable(
         'PATH',
-        $PrependPath + @($ENV:PATH) -join [IO.Path]::PathSeparator,
+        ($PrependPath + $Config.Paths + $CurrentPath | Select-Object -Unique) -join [IO.Path]::PathSeparator,
         [System.EnvironmentVariableTarget]::Process
     )
 
@@ -97,6 +100,9 @@ function Set-NonWindowsOsConfig
 
 function Set-PSReadLineConfig
 {
+    Import-Module PSReadLine
+    Import-Module PSFzf
+
     $PSReadLineVersion = (Get-Module -Name PSReadLine).Version
     $PSReadLinePredictionSource = `
         if($PSReadLineVersion -ge [Version]"2.2.0")
@@ -122,18 +128,19 @@ function Set-PSReadLineConfig
     Set-PSReadLineOption -PredictionSource $PSReadLinePredictionSource -PredictionViewStyle ListView -EditMode Windows
 
     # Remove PSFzf binding
-    Remove-PSReadLineKeyHandler -Chord "Ctrl+r"
-    Remove-PSReadLineKeyHandler -Chord "Alt+c"
+    # Remove-PSReadLineKeyHandler -Chord "Ctrl+r"
+    # Remove-PSReadLineKeyHandler -Chord "Alt+c"
 
     # Remove binding for Linux compatibility (inside TMUX)
     Set-PSReadLineKeyHandler -Chord "Ctrl+Enter" -Function AcceptLine
 
     # PSReadline binding
     Set-PSReadLineKeyHandler -Chord "Ctrl+f" -Function ForwardWord
-    Set-PSReadLineKeyHandler -Chord "Ctrl+r" -Function ReverseSearchHistory
+
+    # Set-PSReadLineKeyHandler -Chord "Ctrl+r" -Function ReverseSearchHistory
+    Set-PsFzfOption -PSReadlineChordReverseHistory "Ctrl+r" -PSReadlineChordSetLocation "Ctrl-g"
 
     Set-PSReadLineKeyHandler -Chord "Tab" -Function MenuComplete
-
     Set-PSReadLineKeyHandler -Chord "Ctrl+t" -ScriptBlock { Open-TmuxSession }
 
     if(Test-Powerline)
@@ -218,5 +225,12 @@ Set-Alias -Name podman -Value podman-remote -Force
 if(-not [Console]::IsOutputRedirected)
 {
     Set-PSReadLineConfig
+}
+
+# Activate Mise
+if($null -ne (Get-Command -Name mise -ErrorAction SilentlyContinue) -and -not $env:MISE_ACTIVATED)
+{
+    mise activate pwsh | Out-String | Invoke-Expression
+    $env:MISE_ACTIVATED = $true
 }
 
